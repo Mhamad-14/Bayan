@@ -1,11 +1,23 @@
 """Lab 1 starter: sentence segmentation."""
 
+import spacy
+
+from .core import preprocess
+
 
 def build_pipeline():
-    # TODO(Lab 1): build the spaCy segmentation pipeline.
-    raise NotImplementedError("Implement build_pipeline() in Lab 1")
+    """Build a lightweight spaCy pipeline for sentence segmentation."""
+
+    nlp = spacy.blank("en")
+    nlp.add_pipe("sentencizer")
+
+    return nlp
 
 
 def split_sentences(raw: str, nlp) -> list[str]:
-    # TODO(Lab 1): preprocess then return non-empty sentence strings.
-    raise NotImplementedError("Implement split_sentences() in Lab 1")
+    """Preprocess text and split it into non-empty sentences."""
+
+    cleaned = preprocess(raw)
+    doc = nlp(cleaned)
+
+    return [sent.text.strip() for sent in doc.sents if sent.text.strip()]
