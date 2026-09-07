@@ -15,6 +15,25 @@
 - PII masking recall: 60 / 60 = 100%
 
 
+## Lab 2 — Transformer anatomy
+
+| Metric | Result |
+|---|---:|
+| Attention max difference vs PyTorch | 0.0000002384 |
+| Attention equivalence within 1e-6 | Passed |
+| Maximum future attention with causal mask | 0.0000000000 |
+| mBERT total parameters | 177,853,440 |
+| mBERT embedding share | 51.84% |
+| CAMeLBERT total parameters | 109,081,344 |
+| CAMeLBERT embedding share | 21.48% |
+| PAD attention without mask | 0.046848 |
+| PAD attention with mask | 0.000000 |
+| Most adjacency-looking head | 7 |
+| Adjacency score | 0.242445 |
+| Strongest [SEP]-sink head | 2 |
+| Mean [SEP] attention | 0.166924 |
+
+
 ## Lab 3 — Models
 | Model | Metric | Validation | Frozen test | Train time |
 |---|---|---:|---:|---:|

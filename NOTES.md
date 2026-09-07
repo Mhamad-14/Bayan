@@ -60,10 +60,25 @@ For each one record: example, why it matters, and clean/preserve/task-dependent.
 
 
 ## Lab 2 — Parameter audit
+
 | Checkpoint | Total params | Embeddings % | Other notes |
 |---|---:|---:|---|
-| mBERT | | | |
-| CAMeLBERT | | | |
+| mBERT | 177,853,440 | 51.84% | Attention: 15.94%, FFN: 31.86% |
+| CAMeLBERT | 109,081,344 | 21.48% | Attention: 25.99%, FFN: 51.95% |
+
+Why is the embedding share different?  
+mBERT has a much larger multilingual vocabulary, so its embedding table consumes a larger share of the model parameters; this is part of the multilingual vocabulary tax, while CAMeLBERT uses a more focused Arabic vocabulary.
+
+### Attention diagnostics
+
+- Scaled dot-product attention matched the PyTorch reference within the required 1e-6 tolerance.
+- Multi-Head Attention preserved the expected input/output shape.
+- The causal mask produced lower-triangular decoder-style attention with zero attention paid to future tokens.
+- Mean PAD attention without mask: 0.046848.
+- Mean PAD attention with mask: 0.000000.
+- Most adjacency-looking head: 7 (score = 0.242445).
+- Strongest [SEP]-sink head: 2 (mean [SEP] attention = 0.166924).
+- Applying the correct attention mask eliminated PAD leakage.
 
 ## Lab 4 — Dialect audit
 - Distribution:
