@@ -35,12 +35,15 @@
 
 
 ## Lab 3 — Models
+
 | Model | Metric | Validation | Frozen test | Train time |
 |---|---|---:|---:|---:|
-| TF-IDF + LinearSVC | macro-F1 | | | |
-| Topic classifier | macro-F1 | | | |
+| TF-IDF + LinearSVC | macro-F1 | 1.0000 | 1.0000 | 0.19 s |
+| Topic classifier | macro-F1 | 1.0000 | 1.0000 | 1720.74 s |
 | NER | entity-F1 | | | |
 | QA | span/null smoke | | | |
+
+- Topic classifier frozen-test delta over TF-IDF baseline: +0.0000
 
 ## Lab 4 — Arabic model bake-off
 | Checkpoint | macro-F1 all | Gulf | MSA | AR fertility |
