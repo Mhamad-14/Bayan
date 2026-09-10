@@ -1,4 +1,4 @@
-# Student Name : Moudi Alhomoud
+# Moudi Alhomoud
 # https://github.com/SDAIAAcademy
 
 # Bayan | بيان
