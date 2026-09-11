@@ -38,12 +38,17 @@
 
 | Model | Metric | Validation | Frozen test | Train time |
 |---|---|---:|---:|---:|
-| TF-IDF + LinearSVC | macro-F1 | 1.0000 | 1.0000 | 0.19 s |
-| Topic classifier | macro-F1 | 1.0000 | 1.0000 | 1720.74 s |
-| NER | entity-F1 | | | |
-| QA | span/null smoke | | | |
+| TF-IDF + LinearSVC | macro-F1 | 1.0000 | 1.0000 | 0.86 s |
+| Topic classifier (CAMeLBERT) | macro-F1 | 1.0000 | 1.0000 | 367.32 s |
+| NER | entity-F1 | 1.0000 | 1.0000 | 73.89 s |
+| QA | span/null smoke | 12/12 spans | 0/0 nulls | N/A |
 
+- Topic classifier validation accuracy: 1.0000
+- Topic classifier frozen-test accuracy: 1.0000
 - Topic classifier frozen-test delta over TF-IDF baseline: +0.0000
+- Grouped split citizen overlap: 0 across train/validation/test.
+- The TF-IDF baseline saturated at macro-F1 = 1.0000 on this run, so the course target of +0.08 improvement is mathematically unattainable without exceeding the maximum F1 of 1.0000.
+- Exact cleaned-text duplicates were present across different citizen groups, although citizen-group leakage remained zero.
 
 ## Lab 4 — Arabic model bake-off
 | Checkpoint | macro-F1 all | Gulf | MSA | AR fertility |
