@@ -53,9 +53,12 @@
 ## Lab 4 — Arabic model bake-off
 | Checkpoint | macro-F1 all | Gulf | MSA | AR fertility |
 |---|---:|---:|---:|---:|
-| multilingual incumbent | | | | |
-| Arabic dialect-aware | | | | |
-| optional third model | | | | |
+| multilingual incumbent (CAMeLBERT-mix) | 0.9992 | 1.0000 | 1.0000 | 1.9049 |
+| Arabic dialect-aware (CAMeLBERT-DA) | 0.9992 | 1.0000 | 1.0000 | 1.9049 |
+- NER LOCATION recall before segmentation: 1.0000
+- NER LOCATION recall with segmentation: 1.0000
+- LOCATION recall delta: +0.0000
+- The Lab 3 baseline LOCATION recall was already 1.0000, so a +0.04 absolute improvement is mathematically impossible without exceeding the recall ceiling.
 
 ## Lab 5 — Search
 | Configuration | recall@10 | MRR@10 | p50 latency/query |

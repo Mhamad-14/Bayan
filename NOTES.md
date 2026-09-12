@@ -81,8 +81,9 @@ mBERT has a much larger multilingual vocabulary, so its embedding table consumes
 - Applying the correct attention mask eliminated PAD leakage.
 
 ## Lab 4 — Dialect audit
-- Distribution:
-- One-sentence implication for MSA-only evaluation:
 
-
-
+- Arabic slice: 7200 / 12000 rows
+- Dialect distribution:
+  - Gulf: 4800
+  - MSA: 2400
+- Implication: evaluating only on MSA can hide performance differences on dialectal/Gulf Arabic, so model choice should use slice-level evidence.

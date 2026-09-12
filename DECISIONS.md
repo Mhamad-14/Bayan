@@ -30,3 +30,13 @@
 - Encoder/decoder rationale by task:
 - Multilingual vs Arabic-centric rationale:
 - Evidence used:
+
+## Arabic model
+
+**Decision:** CAMeLBERT-mix
+
+**Evidence:** CAMeLBERT-mix Gulf macro-F1 = 1.0000; CAMeLBERT-DA Gulf macro-F1 = 1.0000; DA-minus-mix delta = +0.0000.
+
+**Rationale:** CAMeLBERT-mix is selected because the Gulf-slice macro-F1 tied, so the incumbent is retained to avoid unnecessary model churn. The decision is based on the Gulf slice rather than aggregate F1 alone.
+
+**Method:** frozen mean-pooled encoder embeddings with the same logistic-regression linear probe on the leakage-safe Lab 3 grouped split.
