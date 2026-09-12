@@ -86,13 +86,18 @@
 - top-3 prioritised fixes: Review the new category and define a targeted remediation., Expand Arabic normalization and orthographic augmentation., Enforce one shared preprocessing contract across train/eval/serve.
 
 ## Lab 7 — Optimisation ladder
+CPU evidence: `OMP_NUM_THREADS=4`, 160 requests sampled deterministically from `data/serving/bench_mix.npy`.
+
 | Rung | p50 | p99 | quality metric / paired Δ | Artefact size |
 |---|---:|---:|---|---:|
-| fp32 torch @512 padded | | | | |
-| fp32 torch @128 dynamic | | | | |
-| ONNX fp32 @128 | | | | |
-| ONNX INT8 @128 | | | | |
+| fp32 torch @512 padded | 150.02 ms | 159.14 ms | —; speed-up 1.00× | — |
+| fp32 torch @128 dynamic | 30.21 ms | 32.09 ms | —; speed-up 4.96× | — |
+| ONNX fp32 @128 | 9.92 ms | 17.20 ms | —; speed-up 9.25× | 1060.9 MB |
+| ONNX INT8 @128 | 3.70 ms | 6.08 ms | macro-F1 1.0000; tax +0.0000; 95% CI [+0.0000, +0.0000]; speed-up 26.16× | 266.0 MB |
 
-- HTTP p99, 16 concurrent:
-- classifier quantisation decision:
-- NER quantisation decision:
+- classifier bare p99 target <= 25 ms: met
+- speed-up target >= 6x: met
+- classifier quality-tax target <= 0.01 macro-F1: met
+- HTTP p99, 16 concurrent: 74.00 ms; request errors: 0; target <= 40 ms: not met / inspect errors
+- classifier quantisation decision: use INT8
+- NER quantisation decision: see `artifacts/serving/ner_decision.json` if a local Lab 3 NER artefact is available.
