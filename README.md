@@ -224,6 +224,20 @@ No unfinished Lab 3 TODOs found
 
 ---
 
+## Lab 3 — Sentiment Evaluation
+
+CAMeLBERT sentiment classifier results:
+
+- Validation macro-F1: **0.5556**
+- Validation accuracy: **0.8000**
+- Frozen-test macro-F1: **0.5556**
+- Frozen-test accuracy: **0.8000**
+- Frozen-test class F1: negative **1.0000**, neutral **0.0000**, positive **0.6667**
+
+The neutral class was not predicted on the frozen test, so this is reported as a model limitation rather than hidden.
+
+---
+
 ## Lab 4 — Arabic Model Bake-off
 
 | Model | Macro-F1 all | Gulf | MSA |

@@ -52,6 +52,14 @@
 - QA answerable smoke evidence: 12/12 correct on `data/eval/qa_smoke_set.json`.
 - QA no-answer evidence: 20/20 correct on the deterministic first 20 `is_impossible=true` examples from `data/models/bayan_qa.json`, using `deepset/xlm-roberta-base-squad2` with `null_threshold=1.0`; course target >=17/20 met.
 
+### Sentiment classifier
+- Validation macro-F1: 0.5556
+- Validation accuracy: 0.8000
+- Frozen-test macro-F1: 0.5556
+- Frozen-test accuracy: 0.8000
+- Frozen-test class F1: negative 1.0000, neutral 0.0000, positive 0.6667
+- Limitation: neutral-class F1 = 0.0000 on the frozen test.
+
 ## Lab 4 — Arabic model bake-off
 | Checkpoint | macro-F1 all | Gulf | MSA | AR fertility |
 |---|---:|---:|---:|---:|
