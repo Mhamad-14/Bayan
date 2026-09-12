@@ -77,14 +77,13 @@
 - benchmark target MRR@10 >= 0.70: not met
 
 ## Lab 6 — Evaluation
-| Model | Aggregate macro-F1 [CI] | Gulf [CI] | Invariance pass | MFT pass |
+| Model | Aggregate macro-F1 [95% CI] | Accuracy [95% CI] | Invariance pass | MFT pass |
 |---|---|---|---:|---:|
-| topic classifier | | | | |
-| dialect-aware | | | | |
+| topic classifier | 0.8333 [0.8290, 0.8373] | 0.8750 [0.8617, 0.8888] | 0.5000 | 0.9600 |
 
-- paired comparison verdict:
-- error taxonomy top categories:
-- top-3 prioritised fixes:
+- paired comparison: normal vs confidence-gated correctness delta +0.1000, 95% CI [+0.0883, +0.1117]
+- error taxonomy top categories: Other / taxonomy extension needed, Arabic orthographic variation, Preprocessing or serving skew
+- top-3 prioritised fixes: Review the new category and define a targeted remediation., Expand Arabic normalization and orthographic augmentation., Enforce one shared preprocessing contract across train/eval/serve.
 
 ## Lab 7 — Optimisation ladder
 | Rung | p50 | p99 | quality metric / paired Δ | Artefact size |
