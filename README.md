@@ -1,9 +1,13 @@
 # Bayan — NLP with Transformers Labs
 
 **Author:** Moudi Alhomoud  
+
 **Training Program:** [SDAIA Academy](https://github.com/SDAIAAcademy)  
+
 **Instructor Repository:** [SDA-AIE-211-Bayan-Course](https://github.com/AljawharaAlbahlalDev/SDA-AIE-211-Bayan-Course)  
+
 **My Repository:** [Bayan](https://github.com/Mhamad-14/Bayan)
+
 **Trainer:** Aljawhara Albahlal
 
 ## Overview
