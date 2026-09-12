@@ -87,3 +87,9 @@ mBERT has a much larger multilingual vocabulary, so its embedding table consumes
   - Gulf: 4800
   - MSA: 2400
 - Implication: evaluating only on MSA can hide performance differences on dialectal/Gulf Arabic, so model choice should use slice-level evidence.
+
+## Lab 5 — Retrieval diagnosis
+
+The production FAISS path L2-normalises corpus and query vectors before inner-product search. The deliberately unnormalised path measured recall@10 = 0.0462 and MRR@10 = 0.0080, versus the correctly normalised bi-encoder path at recall@10 = 0.0692 and MRR@10 = 0.0175.
+
+The supplied BM25 baseline measured recall@10 = 0.6933 and MRR@10 = 0.7567. The implemented dense retrieval/reranking result is recorded exactly as measured; benchmark targets are not claimed when they are not met. This is why labelled retrieval metrics, rather than plausible-looking examples, are used for approval.

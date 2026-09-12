@@ -63,12 +63,18 @@
 ## Lab 5 — Search
 | Configuration | recall@10 | MRR@10 | p50 latency/query |
 |---|---:|---:|---:|
-| bi-encoder only | | | |
-| + cross-encoder rerank | | | |
-| cross-lingual slice | | | |
+| supplied BM25 baseline | 0.6933 | 0.7567 | — |
+| bi-encoder only | 0.0692 | 0.0175 | 35.55 ms |
+| + cross-encoder rerank | 0.0077 | 0.0026 | 1315.60 ms |
 
-- no-answer empty-correct: ___ / 20
-- cross-lingual gap: ___
+- same-language recall@10: 0.0077
+- cross-language recall@10: 0.0000
+- cross-lingual gap (same - cross): 0.0077
+- no-answer empty-correct: 20 / 20
+- tuned min_score threshold: 0.6651
+- answerable retention at threshold: 1.0000
+- benchmark target recall@10 >= 0.80: not met
+- benchmark target MRR@10 >= 0.70: not met
 
 ## Lab 6 — Evaluation
 | Model | Aggregate macro-F1 [CI] | Gulf [CI] | Invariance pass | MFT pass |
