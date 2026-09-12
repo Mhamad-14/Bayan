@@ -396,3 +396,28 @@ The service is started with:
 `make serve`
 
 The serving command constrains CPU threading for stable FAISS/Transformer execution on the lab environment.
+
+## Reproducing the evidence
+
+The reported results are generated from participant-owned scripts in this repository.
+
+### Core model evidence
+- `python scripts/tfidf_baseline.py`
+- `python scripts/train_classifier.py`
+- `python scripts/train_ner.py`
+- `python scripts/qa_null_eval.py`
+
+Model selection uses validation data before the final frozen-test evaluation.
+
+### Retrieval and evaluation evidence
+- `python notebooks/05_retrieval_eval.py`
+- `python scripts/evaluation_report.py`
+
+### Optimisation and serving evidence
+- `python scripts/benchmark_inference.py`
+- `bash scripts/load_test.sh`
+
+### Tests
+- `pytest -q`
+
+Large generated artefacts are excluded from Git; scripts and evaluation logic remain in the repository.

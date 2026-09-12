@@ -18,6 +18,7 @@
 - [x] Full optimisation ladder + paired quality taxes; fp32 rollback retained.
 - [x] `DECISIONS.md` explains model-family/checkpoint choices with fertility/slice evidence.
 - [ ] Re-runnable scripts; frozen test untouched until final report; participant-owned benchmark numbers.
+  - Re-runnable scripts and participant-owned benchmark generation are evidenced in the repository; historical frozen-test access cannot be independently proven from Git history.
 - [x] Meaningful four-day commit history.
 
 ## Choose at least one extension
