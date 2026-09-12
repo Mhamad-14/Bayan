@@ -370,3 +370,26 @@ This work was completed as part of the **SDAIA Academy** training program.
 - Instructor course repository: https://github.com/AljawharaAlbahlalDev/SDA-AIE-211-Bayan-Course
 
 **Moudi Alhomoud**
+
+
+
+## Integrated Bayan API
+
+The final service exposes the following FastAPI endpoints:
+
+- `GET /health` — startup health, preprocessing version, canary status, and active classifier artefact.
+- `POST /v1/classify` — single-text topic classification.
+- `POST /v1/classify:batch` — batch topic classification capstone extension.
+- `POST /v1/entities` — NER extraction using the trained XLM-R token-classification artefact.
+- `POST /v1/search` — bilingual semantic case search using the versioned FAISS index and cross-encoder reranking.
+- `POST /v1/analyse` — end-to-end classification, entity extraction, and similar-case retrieval.
+
+Large generated model and serving artefacts are intentionally excluded from Git. Reproduce the NER artefact with:
+
+`python scripts/train_ner.py`
+
+The service is started with:
+
+`make serve`
+
+The serving command constrains CPU threading for stable FAISS/Transformer execution on the lab environment.
