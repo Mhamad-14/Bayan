@@ -24,7 +24,7 @@
 - [ ] Dialect router
 - [ ] Two-headed topic+sentiment encoder
 - [ ] Search-quality upgrade
-- [ ] Batch endpoint `/v1/classify:batch`
+- [x] Batch endpoint `/v1/classify:batch`
 - [ ] QA over service documents
 
 ## Final deliverables

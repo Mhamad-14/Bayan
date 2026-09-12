@@ -11,6 +11,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+from bayan.search.service import CaseSearch
+
 from bayan.serving.canaries import (
     PREPROCESS_VERSION,
     preprocess_text,
@@ -27,6 +29,15 @@ app = FastAPI(title="Bayan — Bilingual Citizen-Feedback Intelligence Service")
 
 class ClassifyRequest(BaseModel):
     text: str
+
+
+class BatchClassifyRequest(BaseModel):
+    texts: list[str]
+
+
+class SearchRequest(BaseModel):
+    query: str
+    k: int = 5
 
 
 class TopicPredictor:
@@ -107,6 +118,14 @@ class TopicPredictor:
 
 CANARIES = run_startup_canaries()
 PREDICTOR = TopicPredictor()
+SEARCHER = None
+
+
+def get_searcher():
+    global SEARCHER
+    if SEARCHER is None:
+        SEARCHER = CaseSearch(prefix="artifacts/search/case_index_v1")
+    return SEARCHER
 
 
 @app.get("/health")
@@ -127,6 +146,16 @@ def classify(payload: ClassifyRequest):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+@app.post("/v1/classify:batch")
+def classify_batch(payload: BatchClassifyRequest):
+    if not payload.texts:
+        raise HTTPException(status_code=400, detail="texts must not be empty")
+    try:
+        return {"results": [PREDICTOR.predict(text) for text in payload.texts]}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @app.post("/v1/entities")
 def entities(payload: dict):
     return {
@@ -136,11 +165,19 @@ def entities(payload: dict):
 
 
 @app.post("/v1/search")
-def search(payload: dict):
-    return {
-        "status": "not_implemented_in_lab7",
-        "message": "Search serving integration remains part of the final capstone.",
-    }
+def search(payload: SearchRequest):
+    if not payload.query.strip():
+        raise HTTPException(status_code=400, detail="query must not be empty")
+    try:
+        results = get_searcher().search(
+            payload.query,
+            k=payload.k,
+            candidates=50,
+            min_score=0.6651,
+        )
+        return {"query": payload.query, "results": results}
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"search unavailable: {exc}") from exc
 
 
 @app.post("/v1/analyse")

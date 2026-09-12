@@ -28,4 +28,4 @@ test:
 	pytest -q
 
 serve:
-	uvicorn bayan.serving.api:app --host 0.0.0.0 --port 8000
+	OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 TOKENIZERS_PARALLELISM=false uvicorn bayan.serving.api:app --host 0.0.0.0 --port 8000
