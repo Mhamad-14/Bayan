@@ -40,6 +40,15 @@ class SearchRequest(BaseModel):
     k: int = 5
 
 
+class EntitiesRequest(BaseModel):
+    text: str
+
+
+class AnalyseRequest(BaseModel):
+    text: str
+    k: int = 3
+
+
 class TopicPredictor:
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
@@ -119,6 +128,24 @@ class TopicPredictor:
 CANARIES = run_startup_canaries()
 PREDICTOR = TopicPredictor()
 SEARCHER = None
+NER_PIPELINE = None
+
+
+def get_ner_pipeline():
+    global NER_PIPELINE
+    if NER_PIPELINE is None:
+        ner_dir = ROOT / "artifacts/ner"
+        if not ner_dir.exists():
+            raise FileNotFoundError("Missing NER artefact. Run: python scripts/train_ner.py")
+        from transformers import pipeline
+        NER_PIPELINE = pipeline(
+            "token-classification",
+            model=str(ner_dir),
+            tokenizer=str(ner_dir),
+            aggregation_strategy="simple",
+            device=-1,
+        )
+    return NER_PIPELINE
 
 
 def get_searcher():
@@ -157,11 +184,24 @@ def classify_batch(payload: BatchClassifyRequest):
 
 
 @app.post("/v1/entities")
-def entities(payload: dict):
-    return {
-        "status": "not_implemented_in_lab7",
-        "message": "NER serving integration remains part of the final capstone.",
-    }
+def entities(payload: EntitiesRequest):
+    if not payload.text.strip():
+        raise HTTPException(status_code=400, detail="text must not be empty")
+    try:
+        raw = get_ner_pipeline()(payload.text)
+        results = [
+            {
+                "entity": str(item["entity_group"]),
+                "text": str(item["word"]),
+                "score": float(item["score"]),
+                "start": int(item["start"]),
+                "end": int(item["end"]),
+            }
+            for item in raw
+        ]
+        return {"text": payload.text, "entities": results}
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/v1/search")
@@ -181,8 +221,40 @@ def search(payload: SearchRequest):
 
 
 @app.post("/v1/analyse")
-def analyse(payload: dict):
-    return {
-        "status": "not_implemented_in_lab7",
-        "message": "Composite analysis remains part of the final capstone.",
-    }
+def analyse(payload: AnalyseRequest):
+    if not payload.text.strip():
+        raise HTTPException(status_code=400, detail="text must not be empty")
+    try:
+        classification = PREDICTOR.predict(payload.text)
+
+        raw_entities = get_ner_pipeline()(payload.text)
+        entity_results = [
+            {
+                "entity": str(item["entity_group"]),
+                "text": str(item["word"]),
+                "score": float(item["score"]),
+                "start": int(item["start"]),
+                "end": int(item["end"]),
+            }
+            for item in raw_entities
+        ]
+
+        similar_cases = get_searcher().search(
+            payload.text,
+            k=payload.k,
+            candidates=50,
+            min_score=0.6651,
+        )
+
+        return {
+            "text": payload.text,
+            "classification": classification,
+            "entities": entity_results,
+            "similar_cases": similar_cases,
+        }
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"analysis unavailable: {exc}") from exc
