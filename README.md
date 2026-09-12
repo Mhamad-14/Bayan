@@ -300,8 +300,9 @@ HTTP load test with 16 concurrent clients:
 
 - Responses: **36,530 HTTP 200**
 - Errors: **0**
-- Throughput: **608.62 req/s**
-- HTTP p99: **74 ms**
+- Throughput: **622.08 req/s**
+- HTTP p99: **55 ms**
+- Classifier concurrency is capped at **8 in-flight predictions** to reduce CPU contention and tail latency.
 - Target <= 40 ms: **not met**
 
 

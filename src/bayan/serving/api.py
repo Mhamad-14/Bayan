@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import threading
 from pathlib import Path
 
 import numpy as np
@@ -66,7 +68,7 @@ class TopicPredictor:
 
             path = int8 if int8.exists() else fp32
             opts = ort.SessionOptions()
-            opts.intra_op_num_threads = 1
+            opts.intra_op_num_threads = int(os.environ.get("BAYAN_ORT_THREADS", "1"))
             opts.inter_op_num_threads = 1
             self.session = ort.InferenceSession(
                 str(path),
@@ -127,6 +129,8 @@ class TopicPredictor:
 
 CANARIES = run_startup_canaries()
 PREDICTOR = TopicPredictor()
+CLASSIFY_MAX_INFLIGHT = int(os.environ.get("BAYAN_CLASSIFY_MAX_INFLIGHT", "8"))
+CLASSIFY_SEMAPHORE = threading.BoundedSemaphore(CLASSIFY_MAX_INFLIGHT)
 SEARCHER = None
 NER_PIPELINE = None
 
@@ -168,7 +172,8 @@ def health():
 @app.post("/v1/classify")
 def classify(payload: ClassifyRequest):
     try:
-        return PREDICTOR.predict(payload.text)
+        with CLASSIFY_SEMAPHORE:
+            return PREDICTOR.predict(payload.text)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

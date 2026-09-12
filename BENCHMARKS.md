@@ -108,6 +108,6 @@ CPU evidence: `OMP_NUM_THREADS=4`, 160 requests sampled deterministically from `
 - classifier bare p99 target <= 25 ms: met
 - speed-up target >= 6x: met
 - classifier quality-tax target <= 0.01 macro-F1: met
-- HTTP p99, 16 concurrent: 74.00 ms; request errors: 0; target <= 40 ms: not met / inspect errors
+- HTTP p99, 16 concurrent: 55.00 ms; request errors: 0; target <= 40 ms: not met
 - classifier quantisation decision: use INT8
 - NER quantisation decision: see `artifacts/serving/ner_decision.json` if a local Lab 3 NER artefact is available.

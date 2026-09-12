@@ -41,16 +41,17 @@ fi
 
 python - <<PY
 from pathlib import Path
+import re
 
 p = Path("BENCHMARKS.md")
 text = p.read_text(encoding="utf-8")
 p99 = float("${P99_MS}")
 errors = "${ERRORS}"
 
-old = "- HTTP p99, 16 concurrent: pending load test"
-new = f"- HTTP p99, 16 concurrent: {p99:.2f} ms; request errors: {errors}; target <= 40 ms: " + ("met" if p99 <= 40 and errors == "0" else "not met / inspect errors")
-if old in text:
-    text = text.replace(old, new)
+new = f"- HTTP p99, 16 concurrent: {p99:.2f} ms; request errors: {errors}; target <= 40 ms: " + ("met" if p99 <= 40 and errors == "0" else "not met")
+pattern = r"^- HTTP p99, 16 concurrent:.*$"
+if re.search(pattern, text, flags=re.MULTILINE):
+    text = re.sub(pattern, new, text, count=1, flags=re.MULTILINE)
 else:
     text += "\n" + new + "\n"
 
