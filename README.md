@@ -19,7 +19,7 @@ The work completed so far covers:
 - Named Entity Recognition (NER) with subword BIO-label alignment
 - Extractive Question Answering (QA) span selection and smoke testing
 
-Labs 4–7 are not yet included in the completed-work summary below.
+Labs 1–7 are implemented and evaluated below. Targets that were not achieved are reported explicitly.
 
 ---
 
@@ -31,10 +31,10 @@ Labs 4–7 are not yet included in the completed-work summary below.
 | Lab 2 | Transformer Anatomy + Attention | Completed |
 | Lab 3A | Topic Classification | Implemented and evaluated |
 | Lab 3B | NER + Extractive QA | Completed |
-| Lab 4 | Arabic Pipeline + Dialect-Aware Fine-tuning | Not started / next |
-| Lab 5 | Search / Retrieval | Not started |
-| Lab 6 | Evaluation | Not started |
-| Lab 7 | Optimisation / Serving | Not started |
+| Lab 4 | Arabic Pipeline + Dialect-Aware Fine-tuning | Completed |
+| Lab 5 | Search / Retrieval | Implemented; retrieval targets not met |
+| Lab 6 | Evaluation | Completed |
+| Lab 7 | Optimisation / Serving | Completed; HTTP p99 target not met |
 
 ---
 
@@ -201,10 +201,10 @@ Current smoke-test checkpoint:
 
 Results:
 
-- Answerable questions: **12 / 12 correct**
-- Unanswerable questions in the supplied smoke set: **0**
-- Null result: **0 / 0**
-- QA smoke test: **Passed**
+- Answerable smoke questions: **12 / 12 correct**
+- No-answer evaluation: **20 / 20 correct**
+- Course no-answer target: **>= 17 / 20 — met**
+- QA smoke and null-handling checks: **Passed**
 
 ---
 
@@ -221,6 +221,70 @@ A final unfinished-code scan also reported:
 ```text
 No unfinished Lab 3 TODOs found
 ```
+
+---
+
+## Lab 4 — Arabic Model Bake-off
+
+| Model | Macro-F1 all | Gulf | MSA |
+|---|---:|---:|---:|
+| CAMeLBERT-mix | 0.9992 | 1.0000 | 1.0000 |
+| CAMeLBERT-DA | 0.9992 | 1.0000 | 1.0000 |
+
+NER LOCATION recall remained **1.0000** before and after segmentation. The incumbent CAMeLBERT-mix was retained because the Gulf-slice result tied.
+
+---
+
+## Lab 5 — Semantic Search
+
+| Configuration | Recall@10 | MRR@10 | p50 |
+|---|---:|---:|---:|
+| Supplied BM25 evidence | 0.6933 | 0.7567 | — |
+| Bi-encoder | 0.0256 | 0.0175 | 9.56 ms |
+| Cross-encoder reranked | 0.0026 | 0.0026 | 78.65 ms |
+
+- Same-language Recall@10: **0.0038**
+- Cross-language Recall@10: **0.0000**
+- No-answer correctness: **20 / 20**
+- Recall@10 target >= 0.80: **not met**
+- MRR@10 target >= 0.70: **not met**
+
+The supplied corpus contains substantial duplicate text while each answerable query has only three judged relevant case IDs. The relevance labels were not modified to inflate results.
+
+---
+
+## Lab 6 — Evaluation
+
+| Macro-F1 [95% CI] | Accuracy [95% CI] | Invariance | MFT |
+|---|---|---:|---:|
+| 0.8333 [0.8290, 0.8373] | 0.8750 [0.8617, 0.8888] | 0.8000 | 0.9600 |
+
+- MFT target: **met**
+- Invariance target ~0.95: **not met**
+- Manual error review: **120 examples**
+- Model cards are included in `model_cards/`.
+
+---
+
+## Lab 7 — Optimisation and Serving
+
+| Rung | p50 | p99 | Speed-up |
+|---|---:|---:|---:|
+| PyTorch FP32 @512 | 150.02 ms | 159.14 ms | 1.00x |
+| PyTorch FP32 @128 | 30.21 ms | 32.09 ms | 4.96x |
+| ONNX FP32 @128 | 9.92 ms | 17.20 ms | 9.25x |
+| ONNX INT8 @128 | 3.70 ms | 6.08 ms | 26.16x |
+
+INT8 macro-F1 remained **1.0000** with **0.0000 quality tax**.
+
+HTTP load test with 16 concurrent clients:
+
+- Responses: **36,530 HTTP 200**
+- Errors: **0**
+- Throughput: **608.62 req/s**
+- HTTP p99: **74 ms**
+- Target <= 40 ms: **not met**
+
 
 ---
 
@@ -275,7 +339,7 @@ A custom artifact output directory can be supplied with `--output-dir`.
 - Benchmark values in `BENCHMARKS.md` are from my own runs.
 - Frozen-test results are recorded only after model development/model selection.
 - Large model weights are intentionally kept outside Git.
-- Labs 4–7 will be added as the training program progresses.
+- Labs 1–7 are represented with measured evidence; unmet targets are reported explicitly.
 
 ---
 

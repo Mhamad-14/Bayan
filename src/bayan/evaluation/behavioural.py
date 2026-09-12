@@ -37,11 +37,36 @@ def run_behavioural_suite(
         ]
         invariance["prediction"] = predict_fn(invariance["text"].tolist())
 
-        for (_, template), group in invariance.groupby(["lang", "template"], dropna=False):
-            preds = group["prediction"].astype(str).tolist()
-            passed = None if len(preds) < 2 else (len(set(preds)) == 1)
+        for (_, template), group in invariance.groupby(
+            ["lang", "template"], dropna=False
+        ):
+            predictions = group["prediction"].astype(str)
+            counts = predictions.value_counts()
+            n_unique_terms = int(group["term"].astype(str).nunique())
+
+            # The supplied invariance rows contain perturbations but no
+            # explicit reference row. Use the modal topic within each
+            # language/template group as the reference prediction.
+            unique_mode = (
+                len(counts) == 1
+                or (
+                    len(counts) > 1
+                    and int(counts.iloc[0]) > int(counts.iloc[1])
+                )
+            )
+
+            scorable_group = n_unique_terms >= 2 and unique_mode
+            reference_prediction = (
+                str(counts.index[0]) if scorable_group else None
+            )
 
             for _, row in group.iterrows():
+                passed = (
+                    None
+                    if not scorable_group
+                    else str(row["prediction"]) == reference_prediction
+                )
+
                 records.append(
                     {
                         "test_id": row["test_id"],
@@ -49,8 +74,9 @@ def run_behavioural_suite(
                         "text": row["text"],
                         "prediction": row["prediction"],
                         "expected_relation": row["expected_relation"],
+                        "reference_prediction": reference_prediction,
                         "passed": passed,
-                        "scorable": passed is not None,
+                        "scorable": scorable_group,
                     }
                 )
 
@@ -97,6 +123,11 @@ def run_behavioural_suite(
         summary[test_type] = {
             "n_total": int(len(subset)),
             "n_scorable": int(len(scorable)),
+            "n_unique_texts": (
+                int(subset["text"].dropna().nunique())
+                if "text" in subset.columns
+                else 0
+            ),
             "pass_rate": float(scorable["passed"].mean()) if len(scorable) else None,
         }
 

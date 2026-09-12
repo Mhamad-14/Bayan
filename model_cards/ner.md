@@ -21,8 +21,7 @@ Arabic segmentation evidence is recorded in BENCHMARKS.md.
 No separate NER behavioural suite was supplied for Lab 6.
 
 ## Known limitations
-Lab 6:
-The available NER evidence is strong on the current labelled evaluation set, but Lab 6 does not include a dedicated NER behavioural suite. Performance may therefore be less certain on unseen dialectal wording, unusual clitic segmentation, and entity-boundary patterns not represented in the frozen evaluation data.
+The reported NER evidence comes from the supplied Lab 3 frozen evaluation snapshot. Lab 6 did not provide a separate behavioural robustness suite for NER, so invariance and other perturbation-based robustness were not measured for this artefact. Performance outside the supplied evaluation distribution and entity schema has not been established.
 
 ## Contact / owner
 Bayan course project

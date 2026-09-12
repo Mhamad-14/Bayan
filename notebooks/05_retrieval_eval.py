@@ -30,20 +30,23 @@ def read_jsonl(path: Path):
     return rows
 
 
-def hit_and_rr(retrieved_ids, relevant_ids):
-    relevant = set(relevant_ids)
+def recall_and_rr(retrieved_ids, relevant_ids):
+    """Return true Recall@10 and reciprocal rank for judged case IDs."""
+    relevant = {str(x) for x in relevant_ids}
     if not relevant:
         return None, None
 
-    hit = 1.0 if any(x in relevant for x in retrieved_ids[:10]) else 0.0
+    retrieved = [str(x) for x in retrieved_ids[:10]]
+
+    recall = len(set(retrieved) & relevant) / len(relevant)
 
     rr = 0.0
-    for rank, case_id in enumerate(retrieved_ids[:10], start=1):
+    for rank, case_id in enumerate(retrieved, start=1):
         if case_id in relevant:
             rr = 1.0 / rank
             break
 
-    return hit, rr
+    return float(recall), float(rr)
 
 
 def mean_or_none(values):
@@ -94,7 +97,7 @@ def main():
         bi_latency.append((time.perf_counter() - t0) * 1000.0)
 
         if q.get("relevant_case_ids"):
-            h, rr = hit_and_rr(
+            h, rr = recall_and_rr(
                 [x["case_id"] for x in bi],
                 q["relevant_case_ids"],
             )
@@ -113,7 +116,7 @@ def main():
 
         if q.get("relevant_case_ids"):
             ids = [x["case_id"] for x in rr_rows]
-            h, rr = hit_and_rr(ids, q["relevant_case_ids"])
+            h, rr = recall_and_rr(ids, q["relevant_case_ids"])
             rerank_hits.append(h)
             rerank_rrs.append(rr)
 
@@ -131,11 +134,11 @@ def main():
 
             if same_rel:
                 same_lang_hits.append(
-                    1.0 if set(ids[:10]) & set(same_rel) else 0.0
+                    len(set(ids[:10]) & set(same_rel)) / len(set(same_rel))
                 )
             if cross_rel:
                 cross_lang_hits.append(
-                    1.0 if set(ids[:10]) & set(cross_rel) else 0.0
+                    len(set(ids[:10]) & set(cross_rel)) / len(set(cross_rel))
                 )
 
     scored = []
@@ -211,7 +214,7 @@ def main():
             if int(i) >= 0
         ]
 
-        h, rr = hit_and_rr(retrieved, q["relevant_case_ids"])
+        h, rr = recall_and_rr(retrieved, q["relevant_case_ids"])
         bug_hits.append(h)
         bug_rrs.append(rr)
 

@@ -11,24 +11,23 @@ Retrieve and rerank bilingual historical Bayan cases.
 ## Metrics
 | Metric | Result |
 |---|---:|
-| bi-encoder recall@10 | 0.0692 |
+| bi-encoder recall@10 | 0.0256 |
 | bi-encoder MRR@10 | 0.0175 |
-| reranked recall@10 | 0.0077 |
+| reranked recall@10 | 0.0026 |
 | reranked MRR@10 | 0.0026 |
 | no-answer correctness | 20/20 |
 
 ## Slice metrics
 | Slice | recall@10 |
 |---|---:|
-| same-language | 0.0077 |
+| same-language | 0.0038 |
 | cross-language | 0.0000 |
 
 ## Behavioural tests
 Retrieval-labelled evaluation is documented in BENCHMARKS.md.
 
 ## Known limitations
-Lab 6:
-Retrieval quality remains the main limitation. Bi-encoder recall@10 is 0.0692 and MRR@10 is 0.0175, while reranking decreases recall@10 to 0.0077 and cross-language recall@10 is 0.0000. No-answer behaviour is reliable at 20/20, but the current retrieval configuration should not be treated as production-ready.
+Retrieval quality is substantially below the course targets: reranked Recall@10 is 0.0026 and MRR@10 is 0.0026, and cross-language Recall@10 is 0.0000. The supplied 20,000-case corpus contains 14,599 duplicate-text rows, while each answerable query provides only three judged relevant case IDs; exact-text duplicate cases may therefore be retrieved without being counted as relevant, and large tied groups can affect top-k case IDs. No-answer behaviour reached 20/20 on the supplied no-answer slice, but this result should not be assumed to generalise beyond that evaluation set.
 
 ## Contact / owner
 Bayan course project

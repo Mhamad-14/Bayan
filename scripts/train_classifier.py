@@ -16,7 +16,7 @@ from transformers import (
     TrainingArguments,
 )
 
-from bayan.models.data import build_topic_dataset
+from bayan.models.data import build_sentiment_dataset, build_topic_dataset
 
 
 CHECKPOINT = "CAMeL-Lab/bert-base-arabic-camelbert-mix"
@@ -26,9 +26,19 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
+        "--task",
+        choices=["topic", "sentiment"],
+        default="topic",
+        help="Classification task to train.",
+    )
+
+    parser.add_argument(
         "--output-dir",
-        default="artifacts/topic_classifier",
-        help="Where to save the trained classifier artefact.",
+        default=None,
+        help=(
+            "Where to save the trained classifier artefact. "
+            "Defaults to artifacts/<task>_classifier."
+        ),
     )
 
     parser.add_argument(
@@ -58,8 +68,8 @@ def parse_args():
     return parser.parse_args()
 
 
-class TopicDataset(Dataset):
-    """Tokenized Bayan topic-classification dataset."""
+class ClassificationDataset(Dataset):
+    """Tokenized Bayan sequence-classification dataset."""
 
     def __init__(
         self,
@@ -67,6 +77,7 @@ class TopicDataset(Dataset):
         tokenizer,
         label2id,
         max_length,
+        label_column,
     ):
         texts = dataframe["clean_text"].tolist()
 
@@ -79,7 +90,7 @@ class TopicDataset(Dataset):
 
         self.labels = [
             label2id[label]
-            for label in dataframe["topic"]
+            for label in dataframe[label_column]
         ]
 
     def __len__(self):
@@ -125,7 +136,13 @@ def compute_metrics(eval_pred):
 def main():
     args = parse_args()
 
-    output_dir = Path(args.output_dir)
+    task = args.task
+    label_column = task
+
+    output_dir = Path(
+        args.output_dir
+        or f"artifacts/{task}_classifier"
+    )
 
     output_dir.mkdir(
         parents=True,
@@ -139,12 +156,15 @@ def main():
     torch.manual_seed(42)
     np.random.seed(42)
 
-    print("=== Bayan Topic Classifier ===")
+    print(f"=== Bayan {task.title()} Classifier ===")
     print(f"Checkpoint: {CHECKPOINT}")
     print(f"Max length: {args.max_length}")
 
-    # Leakage-safe grouped splits from Lab 3A Step 2
-    dataset = build_topic_dataset()
+    # Leakage-safe task-specific splits.
+    if task == "topic":
+        dataset = build_topic_dataset()
+    else:
+        dataset = build_sentiment_dataset()
 
     train_df = dataset["train"]
     val_df = dataset["validation"]
@@ -156,7 +176,7 @@ def main():
     print(f"Test:       {len(test_df)}")
 
     labels = sorted(
-        train_df["topic"].unique().tolist()
+        train_df[label_column].unique().tolist()
     )
 
     label2id = {
@@ -176,25 +196,28 @@ def main():
         CHECKPOINT
     )
 
-    train_dataset = TopicDataset(
+    train_dataset = ClassificationDataset(
         train_df,
         tokenizer,
         label2id,
         args.max_length,
+        label_column,
     )
 
-    val_dataset = TopicDataset(
+    val_dataset = ClassificationDataset(
         val_df,
         tokenizer,
         label2id,
         args.max_length,
+        label_column,
     )
 
-    test_dataset = TopicDataset(
+    test_dataset = ClassificationDataset(
         test_df,
         tokenizer,
         label2id,
         args.max_length,
+        label_column,
     )
 
     model = (
@@ -359,6 +382,8 @@ def main():
     )
 
     metrics = {
+        "task": task,
+        "label_column": label_column,
         "checkpoint": CHECKPOINT,
         "max_length": args.max_length,
         "epochs": args.epochs,
@@ -370,6 +395,31 @@ def main():
         "frozen_test_accuracy": test_accuracy,
         "training_time_seconds": training_time,
         "label2id": label2id,
+        "split_sizes": {
+            "train": len(train_df),
+            "validation": len(val_df),
+            "test": len(test_df),
+        },
+        "split_label_counts": {
+            "train": (
+                train_df[label_column]
+                .value_counts()
+                .sort_index()
+                .to_dict()
+            ),
+            "validation": (
+                val_df[label_column]
+                .value_counts()
+                .sort_index()
+                .to_dict()
+            ),
+            "test": (
+                test_df[label_column]
+                .value_counts()
+                .sort_index()
+                .to_dict()
+            ),
+        },
     }
 
     with (

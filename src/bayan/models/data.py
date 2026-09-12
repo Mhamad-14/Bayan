@@ -1,7 +1,7 @@
 """Lab 3A: dataset construction and leakage-safe grouped splits."""
 
 import pandas as pd
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit, StratifiedGroupKFold
 
 from bayan.preprocessing.core import preprocess
 
@@ -92,6 +92,93 @@ def build_topic_dataset(
     train_df = train_df.reset_index(drop=True)
     validation_df = validation_df.reset_index(drop=True)
     test_df = test_df.reset_index(drop=True)
+
+    return {
+        "train": train_df,
+        "validation": validation_df,
+        "test": test_df,
+    }
+
+
+def build_sentiment_dataset(
+    data_path: str = DATA_PATH,
+    random_state: int = 42,
+):
+    """Build stratified, leakage-safe sentiment splits."""
+
+    df = pd.read_csv(data_path)
+
+    required_columns = {
+        "text",
+        "sentiment",
+        "citizen_group_id",
+    }
+
+    missing = required_columns - set(df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing)}"
+        )
+
+    df = df.copy()
+
+    df["clean_text"] = (
+        df["text"]
+        .astype(str)
+        .apply(preprocess)
+    )
+
+    splitter = StratifiedGroupKFold(
+        n_splits=10,
+        shuffle=True,
+        random_state=random_state,
+    )
+
+    folds = []
+
+    for _, fold_idx in splitter.split(
+        df,
+        y=df["sentiment"],
+        groups=df["citizen_group_id"],
+    ):
+        folds.append(fold_idx)
+
+    # Deterministic 70 / 20 / 10 split:
+    # fold 0      -> test
+    # folds 1-2   -> validation
+    # folds 3-9   -> train
+    test_idx = folds[0]
+
+    validation_idx = [
+        index
+        for fold in folds[1:3]
+        for index in fold
+    ]
+
+    train_idx = [
+        index
+        for fold in folds[3:]
+        for index in fold
+    ]
+
+    train_df = (
+        df.iloc[train_idx]
+        .copy()
+        .reset_index(drop=True)
+    )
+
+    validation_df = (
+        df.iloc[validation_idx]
+        .copy()
+        .reset_index(drop=True)
+    )
+
+    test_df = (
+        df.iloc[test_idx]
+        .copy()
+        .reset_index(drop=True)
+    )
 
     return {
         "train": train_df,

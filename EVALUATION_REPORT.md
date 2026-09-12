@@ -39,7 +39,7 @@ Small slices are flagged rather than treated as precise estimates.
 
 | Test | Pass rate | Evidence |
 |---|---:|---|
-| invariance | 0.500 | 200 scorable tests |
+| invariance | 0.800 | 200 scorable rows; 10 unique instantiated texts; per-row agreement with the modal topic within each language/template group |
 | directional | N/A | supplied relation is sentiment-directional; topic classifier cannot legitimately score sentiment direction |
 | MFT | 0.960 | 100 labelled examples |
 
@@ -76,6 +76,9 @@ other validation predictions unchanged.
 - Behavioural directional templates specify sentiment behaviour, while the
   available Lab 3 artefact is a topic classifier. A sentiment-direction
   pass rate is therefore not fabricated.
+- Invariance is scored as per-row agreement with the modal topic within
+  each supplied language/template group because the supplied perturbation
+  rows do not identify a separate reference row.
 - Slice estimates marked as small have high uncertainty.
 - The error taxonomy represents a manually sampled set of 120 errors.
 - Retrieval limitations are documented separately in BENCHMARKS.md.

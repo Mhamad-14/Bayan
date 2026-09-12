@@ -90,6 +90,10 @@ mBERT has a much larger multilingual vocabulary, so its embedding table consumes
 
 ## Lab 5 — Retrieval diagnosis
 
-The production FAISS path L2-normalises corpus and query vectors before inner-product search. The deliberately unnormalised path measured recall@10 = 0.0462 and MRR@10 = 0.0080, versus the correctly normalised bi-encoder path at recall@10 = 0.0692 and MRR@10 = 0.0175.
+The production FAISS path L2-normalises corpus and query vectors before inner-product search. With the corrected multi-relevant Recall@10 calculation, the normalised bi-encoder measured recall@10 = 0.0256 and MRR@10 = 0.0175. The deliberately unnormalised comparison measured recall@10 = 0.0154 and MRR@10 = 0.0080.
 
-The supplied BM25 baseline measured recall@10 = 0.6933 and MRR@10 = 0.7567. The implemented dense retrieval/reranking result is recorded exactly as measured; benchmark targets are not claimed when they are not met. This is why labelled retrieval metrics, rather than plausible-looking examples, are used for approval.
+The cross-encoder reranked result measured recall@10 = 0.0026 and MRR@10 = 0.0026. The course retrieval targets were therefore not claimed as met. No-answer behaviour passed at 20/20 with answerable retention = 1.0000.
+
+A supplied-data limitation was identified during diagnosis. The retrieval corpus contains 20,000 rows but only 5,401 unique `case_text` values, leaving 14,599 duplicate-text rows. Each answerable query contains exactly 3 judged relevant case IDs. Exact-text duplicate cases can therefore be retrieved while remaining outside the supplied judged-ID set, and large tied groups can change which case IDs occupy top-k positions.
+
+The supplied BM25 benchmark values are preserved as provided rather than recomputed. The dense retrieval results above are recorded exactly as measured against the supplied `relevant_case_ids`; no gold labels or corpus rows were altered to improve the benchmark.

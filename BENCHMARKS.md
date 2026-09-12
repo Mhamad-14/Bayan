@@ -41,7 +41,7 @@
 | TF-IDF + LinearSVC | macro-F1 | 1.0000 | 1.0000 | 0.86 s |
 | Topic classifier (CAMeLBERT) | macro-F1 | 1.0000 | 1.0000 | 367.32 s |
 | NER | entity-F1 | 1.0000 | 1.0000 | 73.89 s |
-| QA | span/null smoke | 12/12 spans | 0/0 nulls | N/A |
+| QA | span/null smoke | 12/12 spans | 20/20 nulls | N/A |
 
 - Topic classifier validation accuracy: 1.0000
 - Topic classifier frozen-test accuracy: 1.0000
@@ -49,6 +49,8 @@
 - Grouped split citizen overlap: 0 across train/validation/test.
 - The TF-IDF baseline saturated at macro-F1 = 1.0000 on this run, so the course target of +0.08 improvement is mathematically unattainable without exceeding the maximum F1 of 1.0000.
 - Exact cleaned-text duplicates were present across different citizen groups, although citizen-group leakage remained zero.
+- QA answerable smoke evidence: 12/12 correct on `data/eval/qa_smoke_set.json`.
+- QA no-answer evidence: 20/20 correct on the deterministic first 20 `is_impossible=true` examples from `data/models/bayan_qa.json`, using `deepset/xlm-roberta-base-squad2` with `null_threshold=1.0`; course target >=17/20 met.
 
 ## Lab 4 — Arabic model bake-off
 | Checkpoint | macro-F1 all | Gulf | MSA | AR fertility |
@@ -63,13 +65,13 @@
 ## Lab 5 — Search
 | Configuration | recall@10 | MRR@10 | p50 latency/query |
 |---|---:|---:|---:|
-| supplied BM25 baseline | 0.6933 | 0.7567 | — |
-| bi-encoder only | 0.0692 | 0.0175 | 35.55 ms |
-| + cross-encoder rerank | 0.0077 | 0.0026 | 1315.60 ms |
+| supplied BM25 baseline (provided evidence) | 0.6933 | 0.7567 | — |
+| bi-encoder only | 0.0256 | 0.0175 | 9.56 ms |
+| + cross-encoder rerank | 0.0026 | 0.0026 | 78.65 ms |
 
-- same-language recall@10: 0.0077
+- same-language recall@10: 0.0038
 - cross-language recall@10: 0.0000
-- cross-lingual gap (same - cross): 0.0077
+- cross-lingual gap (same - cross): 0.0038
 - no-answer empty-correct: 20 / 20
 - tuned min_score threshold: 0.6651
 - answerable retention at threshold: 1.0000
@@ -79,7 +81,7 @@
 ## Lab 6 — Evaluation
 | Model | Aggregate macro-F1 [95% CI] | Accuracy [95% CI] | Invariance pass | MFT pass |
 |---|---|---|---:|---:|
-| topic classifier | 0.8333 [0.8290, 0.8373] | 0.8750 [0.8617, 0.8888] | 0.5000 | 0.9600 |
+| topic classifier | 0.8333 [0.8290, 0.8373] | 0.8750 [0.8617, 0.8888] | 0.8000 | 0.9600 |
 
 - paired comparison: normal vs confidence-gated correctness delta +0.1000, 95% CI [+0.0883, +0.1117]
 - error taxonomy top categories: Other / taxonomy extension needed, Arabic orthographic variation, Preprocessing or serving skew

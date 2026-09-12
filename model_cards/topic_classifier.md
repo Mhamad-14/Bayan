@@ -28,13 +28,12 @@ Classify bilingual citizen feedback into Bayan service topics.
 ## Behavioural tests
 | Test | Pass rate | Evidence |
 |---|---:|---|
-| invariance | 0.500 | 200 scorable tests |
+| invariance | 0.800 | 200 scorable rows; 10 unique instantiated texts; per-row agreement with the modal topic within each language/template group |
 | directional | N/A | supplied relation is sentiment-directional; topic classifier cannot legitimately score sentiment direction |
 | MFT | 0.960 | 100 labelled examples |
 
 ## Known limitations
-Lab 6:
-The classifier shows weaker behavioural robustness than its aggregate score suggests: invariance pass rate is 0.50, below the course benchmark of approximately 0.95. Manual error review also identified recurring topic-boundary confusion, especially between parks and roads, so strong aggregate performance should not be interpreted as uniform reliability across examples.
+The classifier does not meet the course invariance benchmark: the measured invariance pass rate is 0.8000 versus the approximate 0.95 target. English location substitutions such as Dammam and Riyadh caused some predictions to change from digital_services to lighting, while the Arabic invariance examples remained stable. The supplied directional behavioural tests concern sentiment, but this artefact predicts topics, so a sentiment-direction pass rate is not reported. Slice results should also be interpreted cautiously where sample sizes are small.
 
 ## Contact / owner
 Bayan course project

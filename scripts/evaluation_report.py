@@ -22,6 +22,7 @@ BEHAVIOUR = ROOT / "data/eval/behavioural_templates.csv"
 MANUAL = ROOT / "artifacts/lab6_manual_error_review.csv"
 MODEL = ROOT / "artifacts/topic_classifier"
 METRICS = MODEL / "metrics.json"
+LAB5_METRICS = ROOT / "artifacts/lab5_retrieval_metrics.json"
 BENCH = ROOT / "BENCHMARKS.md"
 REPORT = ROOT / "EVALUATION_REPORT.md"
 MODEL_CARDS = ROOT / "model_cards"
@@ -110,13 +111,52 @@ def category_fix(category):
 
 def write_model_card(path, **values):
     template = (ROOT / "templates/model_card.md.j2").read_text(encoding="utf-8")
+
+    existing_limitations = None
+    if path.exists():
+        existing = path.read_text(encoding="utf-8")
+        start = existing.find("## Known limitations")
+        end = existing.find("## Contact / owner", start)
+
+        if start >= 0 and end > start:
+            body = existing[
+                start + len("## Known limitations"):end
+            ].strip()
+
+            if (
+                body
+                and "WRITE THIS SECTION BY HAND" not in body
+                and "write this section by hand" not in body.lower()
+            ):
+                existing_limitations = body
+
     for key, value in values.items():
         template = template.replace("{{ " + key + " }}", str(value))
+
+    if existing_limitations:
+        start = template.find("## Known limitations")
+        end = template.find("## Contact / owner", start)
+
+        if start >= 0 and end > start:
+            template = (
+                template[: start + len("## Known limitations")]
+                + "\n"
+                + existing_limitations
+                + "\n\n"
+                + template[end:]
+            )
+
     path.write_text(template, encoding="utf-8")
 
 
 def main():
     pred = pd.read_csv(PRED)
+
+    lab5_metrics = (
+        json.loads(LAB5_METRICS.read_text(encoding="utf-8"))
+        if LAB5_METRICS.exists()
+        else {}
+    )
 
     macro, macro_lo, macro_hi = macro_f1_bootstrap(pred)
 
@@ -246,7 +286,9 @@ def main():
         "| Test | Pass rate | Evidence |\n"
         "|---|---:|---|\n"
         f"| invariance | {'N/A' if invariance_rate is None else f'{invariance_rate:.3f}'} | "
-        f"{summary['invariance']['n_scorable']} scorable tests |\n"
+        f"{summary['invariance']['n_scorable']} scorable rows; "
+        f"{summary['invariance']['n_unique_texts']} unique instantiated texts; "
+        "per-row agreement with the modal topic within each language/template group |\n"
         "| directional | N/A | supplied relation is sentiment-directional; "
         "topic classifier cannot legitimately score sentiment direction |\n"
         f"| MFT | {'N/A' if mft_rate is None else f'{mft_rate:.3f}'} | "
@@ -321,6 +363,9 @@ other validation predictions unchanged.
 - Behavioural directional templates specify sentiment behaviour, while the
   available Lab 3 artefact is a topic classifier. A sentiment-direction
   pass rate is therefore not fabricated.
+- Invariance is scored as per-row agreement with the modal topic within
+  each supplied language/template group because the supplied perturbation
+  rows do not identify a separate reference row.
 - Slice estimates marked as small have high uncertainty.
 - The error taxonomy represents a manually sampled set of 120 errors.
 - Retrieval limitations are documented separately in BENCHMARKS.md.
@@ -404,16 +449,24 @@ Their **Known limitations** sections must be completed manually before submissio
         data_version="20k Bayan historical case corpus",
         metrics_table=(
             "| Metric | Result |\n|---|---:|\n"
-            "| bi-encoder recall@10 | 0.0692 |\n"
-            "| bi-encoder MRR@10 | 0.0175 |\n"
-            "| reranked recall@10 | 0.0077 |\n"
-            "| reranked MRR@10 | 0.0026 |\n"
-            "| no-answer correctness | 20/20 |"
+            f"| bi-encoder recall@10 | "
+            f"{float(lab5_metrics.get('bi_encoder_only', {}).get('recall_at_10', float('nan'))):.4f} |\n"
+            f"| bi-encoder MRR@10 | "
+            f"{float(lab5_metrics.get('bi_encoder_only', {}).get('mrr_at_10', float('nan'))):.4f} |\n"
+            f"| reranked recall@10 | "
+            f"{float(lab5_metrics.get('with_cross_encoder_rerank', {}).get('recall_at_10', float('nan'))):.4f} |\n"
+            f"| reranked MRR@10 | "
+            f"{float(lab5_metrics.get('with_cross_encoder_rerank', {}).get('mrr_at_10', float('nan'))):.4f} |\n"
+            f"| no-answer correctness | "
+            f"{lab5_metrics.get('no_answer', {}).get('correct', 'N/A')}/"
+            f"{lab5_metrics.get('no_answer', {}).get('total', 'N/A')} |"
         ),
         slices_table=(
             "| Slice | recall@10 |\n|---|---:|\n"
-            "| same-language | 0.0077 |\n"
-            "| cross-language | 0.0000 |"
+            f"| same-language | "
+            f"{float(lab5_metrics.get('language_slices', {}).get('same_language_recall_at_10', float('nan'))):.4f} |\n"
+            f"| cross-language | "
+            f"{float(lab5_metrics.get('language_slices', {}).get('cross_language_recall_at_10', float('nan'))):.4f} |"
         ),
         behavioural_table="Retrieval-labelled evaluation is documented in BENCHMARKS.md.",
     )
