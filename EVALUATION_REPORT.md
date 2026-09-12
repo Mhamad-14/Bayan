@@ -32,6 +32,14 @@ Comparison: normal correctness versus confidence-gated correctness
 | dialect_region | N/A | 1200 | 1.000 | 1.000 | 1.000–1.000 | False |
 | length_bucket | medium | 1646 | 0.846 | 0.889 | 0.874–0.905 | False |
 | length_bucket | short | 754 | 0.714 | 0.844 | 0.818–0.869 | False |
+| class | billing | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | digital_services | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | licensing | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | lighting | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | parks | 300 | 0.000 | 0.000 | 0.000–0.000 | False |
+| class | roads | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | waste | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
+| class | water | 300 | 1.000 | 1.000 | 1.000–1.000 | False |
 
 Small slices are flagged rather than treated as precise estimates.
 
@@ -86,4 +94,4 @@ other validation predictions unchanged.
 ## Model cards
 
 Three model-card evidence files are generated under `model_cards/`.
-Their **Known limitations** sections must be completed manually before submission.
+Their **Known limitations** sections contain the manually completed submission limitations.

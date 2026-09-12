@@ -10,15 +10,15 @@
 - [x] Extractive QA has honest null handling; required no-answer target met.
 - [x] Versioned FAISS index + manifest + two-stage reranking.
 - [ ] recall@10 ≥0.80 and MRR@10 ≥0.70; cross-lingual gap reported.
-- [ ] Sliced evaluation: language/dialect/class/length + bootstrap CIs.
+- [x] Sliced evaluation: language/dialect/class/length + bootstrap CIs.
 - [ ] Behavioural suite ≥95% invariance and ≥90% MFT.
-- [ ] ≥100 hand-read errors in final report (Lab 6 works with 120) + top-3 prioritised fixes.
-- [ ] One model card per artefact with hand-written limitations.
+- [x] ≥100 hand-read errors in final report (Lab 6 works with 120) + top-3 prioritised fixes.
+- [x] One model card per artefact with hand-written limitations.
 - [ ] Classifier HTTP p99 ≤40 ms at 16 concurrent on lab CPU.
 - [x] Full optimisation ladder + paired quality taxes; fp32 rollback retained.
 - [x] `DECISIONS.md` explains model-family/checkpoint choices with fertility/slice evidence.
 - [ ] Re-runnable scripts; frozen test untouched until final report; participant-owned benchmark numbers.
-- [ ] Meaningful four-day commit history.
+- [x] Meaningful four-day commit history.
 
 ## Choose at least one extension
 - [ ] Dialect router

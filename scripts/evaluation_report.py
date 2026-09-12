@@ -270,7 +270,7 @@ def main():
         + slice_display["accuracy_ci_high"].map(lambda x: f"{x:.3f}")
     )
 
-    selected_slices = slice_display[slice_display["slice_type"] != "class"][
+    selected_slices = slice_display[
         [
             "slice_name",
             "slice_value",
@@ -373,7 +373,7 @@ other validation predictions unchanged.
 ## Model cards
 
 Three model-card evidence files are generated under `model_cards/`.
-Their **Known limitations** sections must be completed manually before submission.
+Their **Known limitations** sections contain the manually completed submission limitations.
 """
 
     REPORT.write_text(report, encoding="utf-8")
@@ -408,7 +408,7 @@ Their **Known limitations** sections must be completed manually before submissio
         f"| validation macro-F1 | {macro:.4f} |\n"
         f"| validation accuracy | {accuracy:.4f} |"
     )
-    slices_table = markdown_table(selected_slices.head(12), list(selected_slices.columns))
+    slices_table = markdown_table(selected_slices, list(selected_slices.columns))
 
     write_model_card(
         MODEL_CARDS / "topic_classifier.md",
